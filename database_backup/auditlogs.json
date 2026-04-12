@@ -1,0 +1,47 @@
+[
+  {
+    "_id": "69d4857a3e8e85677413d8f8",
+    "admin_id": "69d3bf093d0c1dadc7c1be5c",
+    "action": "CREATE_LAB",
+    "target_type": "lab",
+    "target_name": "",
+    "details": "Hệ thống đã tự động tạo các phòng Lab mặc định",
+    "before": null,
+    "after": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "",
+    "createdAt": "2026-04-07T04:18:02.401Z",
+    "updatedAt": "2026-04-07T04:18:02.401Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4857a3e8e85677413d8f9",
+    "admin_id": "69d3bf093d0c1dadc7c1be5c",
+    "action": "CREATE_CATEGORY",
+    "target_type": "category",
+    "target_name": "",
+    "details": "Hệ thống đã tự động tạo 10 danh mục thiết bị mẫu",
+    "before": null,
+    "after": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "",
+    "createdAt": "2026-04-07T04:18:02.402Z",
+    "updatedAt": "2026-04-07T04:18:02.402Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4857a3e8e85677413d8f7",
+    "admin_id": "69d3bf093d0c1dadc7c1be5c",
+    "action": "CREATE_USER",
+    "target_type": "user",
+    "target_name": "",
+    "details": "Hệ thống đã tự động tạo tài khoản Admin gốc",
+    "before": null,
+    "after": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "",
+    "createdAt": "2026-04-07T04:18:02.400Z",
+    "updatedAt": "2026-04-07T04:18:02.400Z",
+    "__v": 0
+  }
+]

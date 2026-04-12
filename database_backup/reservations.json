@@ -1,0 +1,13 @@
+[
+  {
+    "_id": "69d400a05de7d3aaf45ca37d",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "equipment_id": "69d3bf0a3d0c1dadc7c1beb7",
+    "startTime": "2026-04-06T18:52:00.000Z",
+    "endTime": "2026-04-06T20:00:00.000Z",
+    "status": "confirmed",
+    "createdAt": "2026-04-06T18:51:12.664Z",
+    "updatedAt": "2026-04-06T18:51:12.664Z",
+    "__v": 0
+  }
+]

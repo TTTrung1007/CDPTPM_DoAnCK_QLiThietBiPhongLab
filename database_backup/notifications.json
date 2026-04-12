@@ -1,0 +1,233 @@
+[
+  {
+    "_id": "69d3d3e2bc4577dbc27e73aa",
+    "user_id": "69d3bf093d0c1dadc7c1be7c",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Laptop HP ProBook 450\". Hạn trả: 9/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T15:40:18.158Z",
+    "updatedAt": "2026-04-06T15:40:37.913Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d3d427bc4577dbc27e7427",
+    "user_id": "69d3bf093d0c1dadc7c1be7c",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Laptop HP ProBook 450\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T15:41:27.114Z",
+    "updatedAt": "2026-04-06T15:41:47.210Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d3d5d7063af36c89448ba8",
+    "user_id": "69d3bf093d0c1dadc7c1be76",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Laptop Dell Latitude 5540\". Hạn trả: 14/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T15:48:39.738Z",
+    "updatedAt": "2026-04-07T10:28:15.024Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d3d5f4063af36c89448c14",
+    "user_id": "69d3bf093d0c1dadc7c1be76",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Laptop Dell Latitude 5540\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": false,
+    "createdAt": "2026-04-06T15:49:08.992Z",
+    "updatedAt": "2026-04-06T15:49:08.992Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d400a05de7d3aaf45ca380",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Đặt lịch thành công",
+    "message": "Bạn đã đặt chỗ cho thiết bị \"Cisco Catalyst 2960-X\". Thời gian: 01:52:00 7/4/2026",
+    "type": "reservation",
+    "isRead": true,
+    "createdAt": "2026-04-06T18:51:12.703Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d400c75de7d3aaf45ca39a",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Mượn thiết bị thành công (Theo lô)",
+    "message": "Bạn đã mượn 5 thiết bị thành công (Mã đợt: CO-1775501511568-710). Hạn trả: 7/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T18:51:51.666Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d402e25de7d3aaf45ca3e5",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Cảm biến DHT22\". Hạn trả: 8/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:00:50.940Z",
+    "updatedAt": "2026-04-06T19:01:04.272Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4030e5de7d3aaf45ca459",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cisco Catalyst 2960-X\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:01:34.106Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d403105de7d3aaf45ca48d",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cisco Catalyst 3750-X\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:01:36.609Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d403125de7d3aaf45ca4c1",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cisco ISR 4321 Router\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:01:38.730Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d403145de7d3aaf45ca4f5",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Raspberry Pi 4 Model B (8GB)\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:01:40.952Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d403175de7d3aaf45ca529",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Arduino Mega 2560\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:01:43.411Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d403195de7d3aaf45ca55d",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cảm biến DHT22\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:01:45.804Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d405d35de7d3aaf45ca682",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Cisco Catalyst 2960-X\". Hạn trả: 8/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:13:23.970Z",
+    "updatedAt": "2026-04-06T19:13:32.549Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d407795de7d3aaf45ca70f",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Cisco Catalyst 3750-X\". Hạn trả: 8/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:20:25.259Z",
+    "updatedAt": "2026-04-07T04:08:44.925Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d40af15de7d3aaf45ca89b",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cisco Catalyst 2960-X\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:35:13.044Z",
+    "updatedAt": "2026-04-07T04:08:44.925Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d40b12e50d24b28f920f98",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cisco Catalyst 3750-X\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-06T19:35:46.651Z",
+    "updatedAt": "2026-04-07T04:08:44.925Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4834231d69bb149a7723f",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Cisco Catalyst 2960-X\". Hạn trả: 8/4/2026",
+    "type": "borrow",
+    "isRead": true,
+    "createdAt": "2026-04-07T04:08:34.467Z",
+    "updatedAt": "2026-04-07T04:08:44.925Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4838031d69bb149a772f7",
+    "user_id": "69d3bf093d0c1dadc7c1be69",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Cisco Catalyst 2960-X\" bạn mượn đã được xác nhận trả thành công. Tình trạng: Trầy xước.",
+    "type": "borrow",
+    "isRead": false,
+    "createdAt": "2026-04-07T04:09:36.882Z",
+    "updatedAt": "2026-04-07T04:09:36.882Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4de4942e8b45cff69eb1c",
+    "user_id": "69d3bf093d0c1dadc7c1be76",
+    "title": "Mượn thiết bị thành công",
+    "message": "Bạn đã mượn thiết bị \"Laptop HP ProBook 450\". Hạn trả: 10/4/2026",
+    "type": "borrow",
+    "isRead": false,
+    "createdAt": "2026-04-07T10:36:57.685Z",
+    "updatedAt": "2026-04-07T10:36:57.685Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4eb7c8aabe399cfd99fd7",
+    "user_id": "69d3bf093d0c1dadc7c1be76",
+    "title": "Xác nhận trả thiết bị",
+    "message": "Thiết bị \"Laptop HP ProBook 450\" bạn mượn đã được xác nhận trả thành công.",
+    "type": "borrow",
+    "isRead": false,
+    "createdAt": "2026-04-07T11:33:16.315Z",
+    "updatedAt": "2026-04-07T11:33:16.315Z",
+    "__v": 0
+  }
+]

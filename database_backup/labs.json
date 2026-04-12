@@ -1,0 +1,118 @@
+[
+  {
+    "_id": "69d3bf0a3d0c1dadc7c1bea0",
+    "name": "Phòng Lab Mạng Máy Tính",
+    "room_number": "A101",
+    "building": "Tòa A",
+    "capacity": 40,
+    "description": "Thực hành định tuyến, chuyển mạch, cấu hình Cisco IOS",
+    "manager_id": "69d3bf093d0c1dadc7c1be5c",
+    "status": "active",
+    "equipment_count": 0,
+    "schedule": [
+      {
+        "day_of_week": 1,
+        "open_time": "07:00",
+        "close_time": "21:00",
+        "is_open": true,
+        "_id": "69d3bf0a3d0c1dadc7c1bea1"
+      },
+      {
+        "day_of_week": 2,
+        "open_time": "07:00",
+        "close_time": "21:00",
+        "is_open": true,
+        "_id": "69d3bf0a3d0c1dadc7c1bea2"
+      },
+      {
+        "day_of_week": 3,
+        "open_time": "07:00",
+        "close_time": "21:00",
+        "is_open": true,
+        "_id": "69d3bf0a3d0c1dadc7c1bea3"
+      },
+      {
+        "day_of_week": 4,
+        "open_time": "07:00",
+        "close_time": "21:00",
+        "is_open": true,
+        "_id": "69d3bf0a3d0c1dadc7c1bea4"
+      },
+      {
+        "day_of_week": 5,
+        "open_time": "07:00",
+        "close_time": "21:00",
+        "is_open": true,
+        "_id": "69d3bf0a3d0c1dadc7c1bea5"
+      }
+    ],
+    "createdAt": "2026-04-06T14:11:22.236Z",
+    "updatedAt": "2026-04-06T14:11:22.236Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d3bf0a3d0c1dadc7c1bea8",
+    "name": "Phòng Lab Lập Trình",
+    "room_number": "B203",
+    "building": "Tòa B",
+    "capacity": 35,
+    "description": "Thực hành lập trình web, mobile, các ngôn ngữ lập trình",
+    "manager_id": "69d3bf093d0c1dadc7c1be5c",
+    "status": "active",
+    "equipment_count": 0,
+    "schedule": [],
+    "createdAt": "2026-04-06T14:11:22.257Z",
+    "updatedAt": "2026-04-06T14:11:22.257Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d3bf0a3d0c1dadc7c1beab",
+    "name": "Phòng Lab IoT & Nhúng",
+    "room_number": "C305",
+    "building": "Tòa C",
+    "capacity": 20,
+    "description": "Thực hành IoT, Raspberry Pi, Arduino, cảm biến, lập trình nhúng",
+    "manager_id": "69d3bf093d0c1dadc7c1be5c",
+    "status": "active",
+    "equipment_count": 0,
+    "schedule": [],
+    "createdAt": "2026-04-06T14:11:22.338Z",
+    "updatedAt": "2026-04-06T14:11:22.338Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4d8a9239bdd32b3ebb8f1",
+    "name": "Phòng thí nghiệm Hóa học (H1)",
+    "location": "Tầng 1, Tòa A",
+    "capacity": 30,
+    "operating_hours": "08:00 - 17:00",
+    "is_active": true,
+    "createdAt": "2026-04-07T10:12:57.813Z",
+    "updatedAt": "2026-04-07T10:12:57.813Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4d8cbc2a6dd0b246ab6e8",
+    "name": "Phòng thí nghiệm Sinh học (S2)",
+    "room_number": "S2",
+    "location": "Tầng 2, Tòa B",
+    "capacity": 30,
+    "operating_hours": "08:00 - 17:00",
+    "is_active": true,
+    "createdAt": "2026-04-07T10:13:31.969Z",
+    "updatedAt": "2026-04-07T10:13:31.969Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d4d8cbc2a6dd0b246ab6eb",
+    "name": "Phòng thí nghiệm Vật lý (V3)",
+    "room_number": "V3",
+    "location": "Tầng 3, Tòa C",
+    "capacity": 30,
+    "operating_hours": "08:00 - 17:00",
+    "is_active": true,
+    "createdAt": "2026-04-07T10:13:31.985Z",
+    "updatedAt": "2026-04-07T10:13:31.985Z",
+    "__v": 0
+  }
+]
