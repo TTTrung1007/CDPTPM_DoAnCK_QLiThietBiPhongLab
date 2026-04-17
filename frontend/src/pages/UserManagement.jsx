@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { AuthContext } from '../context/AuthContext';
-import { Users, Lock, Unlock, Shield, UserPlus, X, Eye, EyeOff, Upload, Download, CheckCircle, AlertCircle, FileSpreadsheet, Trash2, Search, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Users, Lock, Unlock, Shield, UserPlus, X, Eye, EyeOff, Upload, Download, CheckCircle, AlertCircle, FileSpreadsheet, Trash2, Search, ArrowUpDown, ChevronUp, ChevronDown, Pencil } from 'lucide-react';
 
 const UserManagement = () => {
   const { user } = useContext(AuthContext);
@@ -16,6 +16,13 @@ const UserManagement = () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'fullname', direction: 'asc' });
+
+  // Edit User State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({ fullname: '', student_id: '', password: '', role: 'student' });
+  const [editError, setEditError] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
 
   // Import Excel state
   const [importResult, setImportResult] = useState(null); // { success, skipped, errors, message }
@@ -94,6 +101,44 @@ const UserManagement = () => {
       setCreateError(error.response?.data?.message || 'Lỗi khi tạo tài khoản');
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  const openEditModal = (usr) => {
+    setEditingUser(usr);
+    setEditForm({
+      fullname: usr.fullname,
+      student_id: usr.student_id,
+      password: '',
+      role: usr.role || 'student'
+    });
+    setEditError('');
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditError('');
+    setEditLoading(true);
+    
+    const payload = {
+      fullname: editForm.fullname,
+      student_id: editForm.student_id,
+      role: editForm.role
+    };
+    if (editForm.password && editForm.password.trim() !== '') {
+      payload.password = editForm.password;
+    }
+
+    try {
+      await axios.put(`http://localhost:5000/api/users/${editingUser._id}`, payload, config);
+      setShowEditModal(false);
+      setEditingUser(null);
+      fetchUsers(); // Tự động load danh sách mới
+    } catch (error) {
+      setEditError(error.response?.data?.message || 'Lỗi khi cập nhật tài khoản');
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -349,6 +394,10 @@ const UserManagement = () => {
                               className={`p-2 rounded-lg transition-colors border ${usr.isLocked ? 'text-green-600 hover:bg-green-50 border-transparent hover:border-green-200' : 'text-red-500 hover:bg-red-50 border-transparent hover:border-red-200'}`}>
                               {usr.isLocked ? <Unlock size={18} /> : <Lock size={18} />}
                             </button>
+                            <button title="Sửa tài khoản" onClick={() => openEditModal(usr)}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200">
+                              <Pencil size={18} />
+                            </button>
                             <button title="Xóa tài khoản" onClick={() => deleteUser(usr._id, usr.fullname)}
                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200">
                               <Trash2 size={18} />
@@ -433,6 +482,81 @@ const UserManagement = () => {
                 <button type="submit" disabled={createLoading}
                   className={`flex-1 py-2.5 rounded-xl text-white font-semibold transition-all ${createLoading ? 'bg-purple-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-600/20'}`}>
                   {createLoading ? 'Đang tạo...' : 'Tạo tài khoản'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowEditModal(false); }}>
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-gray-100">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 p-2 rounded-xl"><Pencil size={20} className="text-blue-600" /></div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">Sửa thông tin tài khoản</h2>
+                  <p className="text-xs text-gray-500">Cập nhật thông tin sinh viên hoặc admin</p>
+                </div>
+              </div>
+              <button onClick={() => setShowEditModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-5">
+              {editError && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
+                  <span>⚠️</span> {editError}
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Họ và Tên <span className="text-red-500">*</span></label>
+                <input type="text" value={editForm.fullname} onChange={e => setEditForm({ ...editForm, fullname: e.target.value })}
+                  placeholder="VD: Nguyễn Văn B" required
+                  className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm outline-none transition-all" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mã sinh viên / MSNV <span className="text-red-500">*</span></label>
+                <input type="text" value={editForm.student_id} onChange={e => setEditForm({ ...editForm, student_id: e.target.value })}
+                  placeholder="VD: sv002" required
+                  className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-mono outline-none transition-all" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mật khẩu mới (Tùy chọn)</label>
+                <div className="relative">
+                  <input type={showPassword ? 'text' : 'password'} value={editForm.password}
+                    onChange={e => setEditForm({ ...editForm, password: e.target.value })}
+                    placeholder="Bỏ trống nếu không muốn đổi"
+                    className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 pr-11 text-sm outline-none transition-all" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Vai trò</label>
+                <div className="flex gap-3">
+                  {['student', 'admin'].map(r => (
+                    <button key={r} type="button" onClick={() => setEditForm({ ...editForm, role: r })}
+                      className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all
+                        ${editForm.role === r
+                          ? (r === 'admin' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-blue-500 bg-blue-50 text-blue-700')
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                    >
+                      {r === 'student' ? '👤 Sinh viên' : '🛡️ Admin'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowEditModal(false)}
+                  className="flex-1 py-2.5 rounded-xl text-gray-600 bg-gray-100 hover:bg-gray-200 font-semibold transition-colors">Hủy</button>
+                <button type="submit" disabled={editLoading}
+                  className={`flex-1 py-2.5 rounded-xl text-white font-semibold transition-all ${editLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20'}`}>
+                  {editLoading ? 'Đang lưu...' : 'Lưu Thay Đổi'}
                 </button>
               </div>
             </form>

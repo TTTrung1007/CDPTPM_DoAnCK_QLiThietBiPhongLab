@@ -21,3 +21,11 @@ exports.deleteLab = async (req, res) => {
     res.json({ message: 'Lab removed' });
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
+
+exports.updateLab = async (req, res) => {
+  try {
+    const lab = await Lab.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!lab) return res.status(404).json({ message: 'Lab not found' });
+    res.json(lab);
+  } catch (error) { res.status(400).json({ message: error.message }); }
+};

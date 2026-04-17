@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { MapPin, Plus, Trash2 } from 'lucide-react';
+import { MapPin, Plus, Trash2, Edit2, X } from 'lucide-react';
 
 const LabManagement = () => {
   const [labs, setLabs] = useState([]);
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [capacity, setCapacity] = useState(30);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const fetchLabs = async () => {
     try {
@@ -17,23 +19,52 @@ const LabManagement = () => {
 
   useEffect(() => { fetchLabs(); }, []);
 
-  const handleCreate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/labs', 
-        { name, location, capacity }, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
+      const labData = { name, location, capacity };
+      
+      if (isEditing) {
+        await axios.put(`http://localhost:5000/api/labs/${editingId}`, 
+          labData, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setIsEditing(false);
+        setEditingId(null);
+      } else {
+        await axios.post('http://localhost:5000/api/labs', 
+          labData, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+      
       setName(''); setLocation(''); setCapacity(30);
       fetchLabs();
-    } catch (error) { alert('Lỗi tạo phòng Lab'); }
+    } catch (error) { alert(isEditing ? 'Lỗi cập nhật phòng Lab' : 'Lỗi tạo phòng Lab'); }
+  };
+
+  const handleEdit = (lab) => {
+    setName(lab.name);
+    setLocation(lab.location);
+    setCapacity(lab.capacity);
+    setEditingId(lab._id);
+    setIsEditing(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setName('');
+    setLocation('');
+    setCapacity(30);
+    setEditingId(null);
+    setIsEditing(false);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Xóa phòng lab này?')) return;
     try {
-      const token = localStorage.getItem('token');
+      const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
       await axios.delete(`http://localhost:5000/api/labs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -50,8 +81,8 @@ const LabManagement = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-gray-100">
-            <h2 className="text-xl font-bold mb-4">Thêm Lab Mới</h2>
-            <form onSubmit={handleCreate} className="space-y-4">
+            <h2 className="text-xl font-bold mb-4">{isEditing ? 'Sửa Thông Tin Lab' : 'Thêm Lab Mới'}</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Tên phòng Lab</label>
                 <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="mt-1 block w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-brand-500 focus:border-brand-500" />
@@ -64,9 +95,17 @@ const LabManagement = () => {
                 <label className="block text-sm font-medium text-gray-700">Sức chứa (số lượng thiết bị)</label>
                 <input type="number" required value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} className="mt-1 block w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-brand-500 focus:border-brand-500" />
               </div>
-              <button type="submit" className="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700">
-                <Plus size={18} /> Thêm Lab
-              </button>
+              <div className="flex gap-2">
+                <button type="submit" className="flex-1 flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700">
+                  {isEditing ? <Edit2 size={18} /> : <Plus size={18} />} 
+                  {isEditing ? 'Cập Nhật Lab' : 'Thêm Lab'}
+                </button>
+                {isEditing && (
+                  <button type="button" onClick={handleCancelEdit} className="flex justify-center items-center gap-2 py-2 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <X size={18} /> Hủy
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </div>
@@ -89,9 +128,14 @@ const LabManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{lab.location}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{lab.capacity} thiết bị</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                       <button onClick={() => handleDelete(lab._id)} className="text-red-500 border border-red-200 bg-red-50 hover:bg-red-500 hover:text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1 ml-auto">
-                        <Trash2 size={16} /> Xóa
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEdit(lab)} className="text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-600 hover:text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+                          <Edit2 size={16} /> Sửa
+                        </button>
+                        <button onClick={() => handleDelete(lab._id)} className="text-red-500 border border-red-200 bg-red-50 hover:bg-red-500 hover:text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+                          <Trash2 size={16} /> Xóa
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -9,8 +9,26 @@ const borrowEquipment = async (req, res) => {
   try {
     const equipment = await Equipment.findById(equipment_id);
     if (!equipment) return res.status(404).json({ message: 'Không tìm thấy thiết bị' });
-    if (equipment.status !== 'available') {
+    const Reservation = require('../models/Reservation');
+
+    if (equipment.status !== 'available' && equipment.status !== 'reserved') {
       return res.status(400).json({ message: 'Thiết bị hiện không sẵn sàng để mượn' });
+    }
+
+    const now = new Date();
+    const activeRes = await Reservation.findOne({
+      equipment_id,
+      status: 'confirmed',
+      startTime: { $lte: now },
+      endTime: { $gt: now }
+    });
+
+    if (activeRes) {
+      if (activeRes.user_id.toString() !== req.user._id.toString()) {
+        return res.status(400).json({ message: 'Thiết bị này đang được người khác đặt chỗ' });
+      }
+      activeRes.status = 'completed';
+      await activeRes.save();
     }
 
     const record = await BorrowRecord.create({
@@ -119,8 +137,27 @@ const bulkBorrowEquipment = async (req, res) => {
   }
 
   try {
+    const Reservation = require('../models/Reservation');
     const equipments = await Equipment.find({ _id: { $in: equipment_ids } });
-    const unavailable = equipments.filter(e => e.status !== 'available');
+    const unavailable = [];
+    const now = new Date();
+
+    for (const eq of equipments) {
+      if (eq.status !== 'available' && eq.status !== 'reserved') {
+        unavailable.push(eq);
+        continue;
+      }
+      const activeRes = await Reservation.findOne({
+        equipment_id: eq._id,
+        status: 'confirmed',
+        startTime: { $lte: now },
+        endTime: { $gt: now }
+      });
+      if (activeRes && activeRes.user_id.toString() !== req.user._id.toString()) {
+        unavailable.push(eq);
+      }
+    }
+
     if (unavailable.length > 0) {
       return res.status(400).json({ 
         message: `Có ${unavailable.length} thiết bị hiện không sẵn sàng`,
@@ -138,6 +175,19 @@ const bulkBorrowEquipment = async (req, res) => {
       eq.status = 'borrowed';
       eq.borrow_count = (eq.borrow_count || 0) + 1;
       await eq.save();
+      
+      const activeRes = await Reservation.findOne({
+        equipment_id: eq._id,
+        user_id: req.user._id,
+        status: 'confirmed',
+        startTime: { $lte: new Date() },
+        endTime: { $gt: new Date() }
+      });
+      if (activeRes) {
+        activeRes.status = 'completed';
+        await activeRes.save();
+      }
+
       records.push(record);
     }
 
@@ -170,4 +220,78 @@ const getUserHistoryAdmin = async (req, res) => {
   }
 };
 
-module.exports = { borrowEquipment, getMyHistory, getActiveRecords, confirmReturn, bulkBorrowEquipment, getUserHistoryAdmin };
+const getActiveRecordByEquipment = async (req, res) => {
+  try {
+    const record = await BorrowRecord.findOne({ 
+      equipment_id: req.params.equipmentId, 
+      status: 'active' 
+    })
+    .populate('user_id', 'fullname student_id')
+    .sort({ borrow_date: -1 });
+    
+    if (!record) return res.json(null);
+    res.json(record);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getTopBorrowers = async (req, res) => {
+  try {
+    const { month, year, day } = req.query;
+    const now = new Date();
+
+    // Build date filter
+    const matchStage = {};
+    if (year || month || day) {
+      const filterYear = parseInt(year) || now.getFullYear();
+      if (day && month) {
+        const filterMonth = parseInt(month) - 1;
+        const filterDay = parseInt(day);
+        const startDate = new Date(filterYear, filterMonth, filterDay, 0, 0, 0);
+        const endDate = new Date(filterYear, filterMonth, filterDay, 23, 59, 59);
+        matchStage.borrow_date = { $gte: startDate, $lte: endDate };
+      } else if (month) {
+        const filterMonth = parseInt(month) - 1;
+        const startDate = new Date(filterYear, filterMonth, 1);
+        const endDate = new Date(filterYear, filterMonth + 1, 0, 23, 59, 59);
+        matchStage.borrow_date = { $gte: startDate, $lte: endDate };
+      } else {
+        const startDate = new Date(filterYear, 0, 1);
+        const endDate = new Date(filterYear, 11, 31, 23, 59, 59);
+        matchStage.borrow_date = { $gte: startDate, $lte: endDate };
+      }
+    }
+
+    const topBorrowers = await BorrowRecord.aggregate([
+      { $match: matchStage },
+      { $group: { _id: '$user_id', borrowCount: { $sum: 1 } } },
+      { $sort: { borrowCount: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' },
+      {
+        $project: {
+          _id: 1,
+          borrowCount: 1,
+          fullname: '$user.fullname',
+          student_id: '$user.student_id',
+          class_name: '$user.class_name'
+        }
+      }
+    ]);
+
+    res.json(topBorrowers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { borrowEquipment, getMyHistory, getActiveRecords, confirmReturn, bulkBorrowEquipment, getUserHistoryAdmin, getActiveRecordByEquipment, getTopBorrowers };

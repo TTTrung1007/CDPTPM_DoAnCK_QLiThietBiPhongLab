@@ -20,6 +20,8 @@ const EquipmentDetail = () => {
    const [resStart, setResStart] = useState('');
    const [resEnd, setResEnd] = useState('');
    const [resLoading, setResLoading] = useState(false);
+   const [activeBorrowRecord, setActiveBorrowRecord] = useState(null);
+   const [resNote, setResNote] = useState('');
    
    // QR Verification States
    const [isVerified, setIsVerified] = useState(false);
@@ -50,10 +52,19 @@ const EquipmentDetail = () => {
       }
    };
 
+   const fetchActiveBorrow = async () => {
+      try {
+         const { data } = await axios.get(`http://localhost:5000/api/borrow/active/equipment/${id}`, config);
+         setActiveBorrowRecord(data);
+      } catch (e) {
+         console.error('Lỗi tải thông tin mượn hiện tại');
+      }
+   };
+
    useEffect(() => {
       setLoading(true);
       const loadAll = async () => {
-         await Promise.all([fetchEquipment(), fetchReservations()]);
+         await Promise.all([fetchEquipment(), fetchReservations(), fetchActiveBorrow()]);
          setLoading(false);
       };
       loadAll();
@@ -91,11 +102,13 @@ const EquipmentDetail = () => {
          await axios.post('http://localhost:5000/api/reservations', {
             equipment_id: id,
             startTime: resStart,
-            endTime: resEnd
+            endTime: resEnd,
+            note: resNote
          }, config);
-         setMessage('Đặt lịch thành công!');
+         setMessage('Đặt lịch thành công! Hệ thống đã xác nhận lịch của bạn.');
          setResStart('');
          setResEnd('');
+         setResNote('');
          fetchReservations();
       } catch (err) {
          setError(err.response?.data?.message || 'Lỗi khi đặt lịch');
@@ -110,10 +123,14 @@ const EquipmentDetail = () => {
       setVerificationError(null);
 
       // Regex to extract MongoDB ID from URL or raw string
-      const match = content.match(/\/equipment\/([a-f\d]{24})/) || content.match(/^([a-f\d]{24})$/);
+      const safeContent = String(content || '');
+      const match = safeContent.match(/\/equipment\/([a-f\d]{24})/) || safeContent.match(/^([a-f\d]{24})$/);
       const extractedId = match ? match[1] : null;
 
-      if (extractedId === id) {
+      const safeSerial = String(equipment?.serial_number || '');
+      const isSerialMatch = safeContent.trim().toLowerCase() === safeSerial.trim().toLowerCase() && safeSerial !== '';
+
+      if (extractedId === id || isSerialMatch) {
          setTimeout(() => {
             setIsVerified(true);
             setIsVerifying(false);
@@ -121,7 +138,7 @@ const EquipmentDetail = () => {
          }, 800);
       } else {
          setIsVerifying(false);
-         setVerificationError('Mã QR không khớp với thiết bị hiện tại. Vui lòng kiểm tra lại!');
+         setVerificationError('Mã xác nhận không khớp với thiết bị hiện tại. Vui lòng kiểm tra lại!');
       }
    };
 
@@ -153,7 +170,8 @@ const EquipmentDetail = () => {
 
    useEffect(() => {
       const handleGlobalPaste = (e) => {
-         if (isVerified || equipment?.status !== 'available') return;
+         const interactable = equipment?.status === 'available' || equipment?.status === 'reserved';
+         if (isVerified || !interactable) return;
          const items = e.clipboardData?.items;
          if (!items) return;
          
@@ -190,7 +208,12 @@ const EquipmentDetail = () => {
    }, [isVerified, equipment, id]);
 
    useEffect(() => {
-      if (verificationMethod === 'scan' && !isVerified && equipment?.status === 'available') {
+      if (loading) return; // Prevent scanner initialization before DOM is ready
+      const interactable = equipment?.status === 'available' || equipment?.status === 'reserved';
+      if (verificationMethod === 'scan' && !isVerified && interactable) {
+         // Defensive check to ensure the element exists before initializing
+         if (!document.getElementById("reader")) return;
+         
          const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
          scanner.render((data) => {
             scanner.clear();
@@ -200,16 +223,19 @@ const EquipmentDetail = () => {
          });
          return () => scanner.clear();
       }
-   }, [verificationMethod, isVerified, equipment]);
+   }, [verificationMethod, isVerified, equipment, loading]);
 
    if (loading) return <div className="flex justify-center my-12"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500"></div></div>;
    if (!equipment) return <div className="text-center my-12 text-red-500 font-medium">{error}</div>;
 
    const StatusBadge = ({ status }) => {
       if (status === 'available') return <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium"><CheckCircle2 className="w-4 h-4" /> Có sẵn</span>;
+      if (status === 'reserved') return <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium"><CalendarDays className="w-4 h-4" /> Đã đặt chỗ</span>;
       if (status === 'borrowed') return <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium"><AlertTriangle className="w-4 h-4" /> Đang mượn</span>;
       return <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium"><XCircle className="w-4 h-4" /> Bảo trì</span>;
    };
+
+   const isInteractable = equipment?.status === 'available' || equipment?.status === 'reserved';
 
    return (
       <div className="max-w-6xl mx-auto py-6 px-4">
@@ -292,21 +318,36 @@ const EquipmentDetail = () => {
                {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 flex items-start gap-3 animate-shake font-medium text-sm"><XCircle size={18} className="mt-0.5" /> {error}</div>}
                {message && <div className="p-4 bg-green-50 text-green-600 rounded-2xl border border-green-100 flex items-start gap-3 animate-fade-in font-medium text-sm"><CheckCircle2 size={18} className="mt-0.5" /> {message}</div>}
 
-               {/* Borrow Now Section */}
-               <div id="borrow-section" className={`p-8 rounded-[32px] border transition-all duration-500 ${equipment.status === 'available' ? (isVerified ? 'bg-brand-600 border-brand-500 shadow-2xl' : 'bg-white border-gray-200 shadow-xl') : 'bg-gray-100 text-gray-400 border-gray-200 opacity-80'}`}>
+               {/* Borrow Now / Borrowed Status Section */}
+               <div id="borrow-section" className={`p-8 rounded-[32px] border transition-all duration-500 ${
+                  isInteractable 
+                     ? (isVerified ? 'bg-brand-600 border-brand-500 shadow-2xl' : 'bg-white border-gray-200 shadow-xl') 
+                     : equipment.status === 'borrowed'
+                     ? 'bg-amber-50 border-amber-200 shadow-xl'
+                     : 'bg-gray-100 text-gray-400 border-gray-200 opacity-80'
+               }`}>
                   <div className="flex items-center justify-between mb-8">
-                     <h2 className={`text-xl font-black flex items-center gap-3 ${equipment.status === 'available' && isVerified ? 'text-white' : 'text-gray-900'}`}>
-                        <Package size={24} className={isVerified ? 'text-white' : 'text-brand-500'} /> 
-                        {isVerified ? 'Phiếu mượn đã sẵn sàng' : 'Mượn thiết bị ngay'}
+                     <h2 className={`text-xl font-black flex items-center gap-3 ${
+                        isInteractable && isVerified ? 'text-white' 
+                        : equipment.status === 'borrowed' ? 'text-amber-800'
+                        : 'text-gray-900'
+                     }`}>
+                        <Package size={24} className={isVerified ? 'text-white' : equipment.status === 'borrowed' ? 'text-amber-500' : 'text-brand-500'} /> 
+                        {isVerified ? 'Phiếu mượn đã sẵn sàng' : equipment.status === 'borrowed' ? 'Thiết bị đang được mượn' : 'Mượn thiết bị ngay'}
                      </h2>
-                     {equipment.status === 'available' && (
+                     {isInteractable && (
                         <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border-2 ${isVerified ? 'bg-white text-brand-600 border-white' : 'bg-gray-100 text-gray-400 border-gray-200'}`}>
                            {isVerified ? 'ĐÃ XÁC THỰC VỊ TRÍ' : 'CHỜ XÁC THỰC QR'}
                         </div>
                      )}
+                     {equipment.status === 'borrowed' && (
+                        <div className="px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border-2 bg-amber-100 text-amber-700 border-amber-200">
+                           ĐANG BẬN
+                        </div>
+                     )}
                   </div>
 
-                  {equipment.status === 'available' ? (
+                  {isInteractable ? (
                      !isVerified ? (
                         <div className="space-y-6">
                            <div className="bg-brand-50 border border-brand-100 p-5 rounded-2xl flex items-center justify-between gap-4">
@@ -338,7 +379,7 @@ const EquipmentDetail = () => {
                               {[
                                  { id: 'scan', label: 'Quét Camera', icon: <Scan size={16} /> },
                                  { id: 'upload', label: 'Tải ảnh lên', icon: <Upload size={16} /> },
-                                 { id: 'paste', label: 'Dán mã/link', icon: <ClipboardCheck size={16} /> }
+                                 { id: 'paste', label: 'Nhập Seri/Link', icon: <ClipboardCheck size={16} /> }
                               ].map(tab => (
                                  <button
                                     key={tab.id}
@@ -393,7 +434,7 @@ const EquipmentDetail = () => {
                                                 type="text" 
                                                 value={pasteValue}
                                                 onChange={e => setPasteValue(e.target.value)}
-                                                placeholder="Link hoặc ID thiết bị..."
+                                                placeholder="Nhập mã Seri thiết bị, Link hoặc ID..."
                                                 className="w-full bg-white border-2 border-gray-100 rounded-2xl p-5 text-sm font-bold outline-none focus:border-brand-500 transition-all pr-12"
                                              />
                                              <ClipboardCheck size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" />
@@ -449,21 +490,60 @@ const EquipmentDetail = () => {
                            </button>
                         </form>
                      )
+                  ) : equipment.status === 'borrowed' ? (
+                     /* Show borrower info when equipment is borrowed */
+                     <div className="space-y-5">
+                        {activeBorrowRecord ? (
+                           <div className="flex items-start gap-4 p-5 bg-amber-100/60 rounded-2xl border border-amber-200">
+                              <div className="bg-amber-400 p-2.5 rounded-xl text-white shrink-0 shadow-md">
+                                 <User size={20} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                 <p className="text-xs font-black text-amber-700 uppercase tracking-widest mb-1">Đang được mượn bởi</p>
+                                 <p className="font-black text-amber-900 text-lg truncate">{activeBorrowRecord.user_id?.fullname}</p>
+                                 <p className="text-sm text-amber-700 font-medium">MSSV: {activeBorrowRecord.user_id?.student_id}</p>
+                                 <div className="flex items-center gap-2 mt-3 pt-3 border-t border-amber-200">
+                                    <Clock size={14} className="text-amber-600 shrink-0" />
+                                    <span className="text-xs font-bold text-amber-800">
+                                       Dự kiến trả: {activeBorrowRecord.expected_return_date 
+                                          ? new Date(activeBorrowRecord.expected_return_date).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })
+                                          : 'Chưa xác định'
+                                       }
+                                    </span>
+                                 </div>
+                              </div>
+                           </div>
+                        ) : (
+                           <div className="flex items-center gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                              <AlertTriangle size={18} className="text-amber-500" />
+                              <p className="text-sm font-bold text-amber-700">Thiết bị đang được sử dụng.</p>
+                           </div>
+                        )}
+                        <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                           <CalendarDays size={18} className="text-blue-500 shrink-0" />
+                           <p className="text-sm font-medium text-blue-700">Bạn có thể <span className="font-black">đặt lịch trước</span> cho thiết bị này. Hệ thống sẽ tự động xác nhận khi không trùng lịch.</p>
+                        </div>
+                     </div>
                   ) : (
                      <div className="flex items-center gap-4 py-4">
                         <div className="bg-gray-200/50 p-3 rounded-full text-gray-400"><XCircle size={24} /></div>
-                        <p className="font-bold text-gray-500 text-sm">Thiết bị hiện đang bận hoặc đang bảo trì, không thể mượn ngay.</p>
+                        <p className="font-bold text-gray-500 text-sm">Thiết bị đang bảo trì, không thể mượn hoặc đặt lịch.</p>
                      </div>
                   )}
                </div>
 
-               {/* Reservation Section - Only show when verified */}
-               {isVerified && (
-                  <div className="glass-card p-8 rounded-[32px] border-white/60 bg-white/50 animate-in fade-in zoom-in duration-1000 delay-200">
-                     <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-3">
+               {/* Reservation Section - Show when verified (available) or when borrowed */}
+               {(isVerified || equipment.status === 'borrowed') && (
+                  <div className={`glass-card p-8 rounded-[32px] border-white/60 bg-white/50 animate-in fade-in zoom-in duration-1000 ${
+                     isVerified ? 'delay-200' : ''
+                  }`}>
+                     <h2 className="text-xl font-black text-gray-900 mb-2 flex items-center gap-3">
                         <CalendarDays size={24} className="text-indigo-600" /> Đặt lịch cho tương lai
                      </h2>
-                     <form onSubmit={handleReservation} className="space-y-6">
+                     {equipment.status === 'borrowed' && (
+                        <p className="text-xs text-gray-500 mb-6">Chọn thời gian bạn muốn mượn. Lịch đặt sẽ được xác nhận ngay nếu không trùng với ai khác.</p>
+                     )}
+                     <form onSubmit={handleReservation} className="space-y-6 mt-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <div className="space-y-2">
                               <label className="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Thời gian bắt đầu</label>
@@ -471,6 +551,7 @@ const EquipmentDetail = () => {
                                  type="datetime-local"
                                  value={resStart}
                                  onChange={e => setResStart(e.target.value)}
+                                 min={new Date().toISOString().slice(0, 16)}
                                  className="w-full bg-gray-50 border-gray-200 rounded-2xl p-4 text-gray-900 focus:ring-2 focus:ring-indigo-500 border outline-none font-bold"
                               />
                            </div>
@@ -480,9 +561,20 @@ const EquipmentDetail = () => {
                                  type="datetime-local"
                                  value={resEnd}
                                  onChange={e => setResEnd(e.target.value)}
+                                 min={resStart || new Date().toISOString().slice(0, 16)}
                                  className="w-full bg-gray-50 border-gray-200 rounded-2xl p-4 text-gray-900 focus:ring-2 focus:ring-indigo-500 border outline-none font-bold"
                               />
                            </div>
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Ghi chú (tùy chọn)</label>
+                           <input
+                              type="text"
+                              value={resNote}
+                              onChange={e => setResNote(e.target.value)}
+                              placeholder="Mục đích sử dụng, môn học..."
+                              className="w-full bg-gray-50 border-gray-200 rounded-2xl p-4 text-gray-900 focus:ring-2 focus:ring-indigo-500 border outline-none text-sm"
+                           />
                         </div>
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4 border-t border-gray-100">
                            <p className="text-xs text-gray-500 italic max-w-sm">Hệ thống sẽ tự động xác nhận lịch đặt nếu không trùng với bất kỳ ai khác.</p>

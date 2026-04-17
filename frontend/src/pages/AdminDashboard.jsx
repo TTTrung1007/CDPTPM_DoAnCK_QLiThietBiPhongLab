@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { LayoutDashboard, Plus, QrCode, MonitorPlay, Activity, PackageCheck, AlertCircle, FileDown, FileUp, Search, Trophy, Star, Medal, ShieldCheck, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
+import { LayoutDashboard, Plus, QrCode, MonitorPlay, Activity, PackageCheck, AlertCircle, FileDown, FileUp, Search, Trophy, Star, Medal, ShieldCheck, CheckCircle, XCircle, RotateCcw, UserPlus, X, Eye, EyeOff, Upload } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 const AdminDashboard = () => {
@@ -25,7 +25,24 @@ const AdminDashboard = () => {
   const [newLabId, setNewLabId] = useState('');
   const [newImage, setNewImage] = useState(''); // Image URL or Base64
   const [formMessage, setFormMessage] = useState({ type: '', text: '' }); // Form success/error message
-  const [topUsers, setTopUsers] = useState([]); // List of high-reputation students
+  const [topBorrowers, setTopBorrowers] = useState([]); // List of top borrowers
+  const [topBorrowerFilter, setTopBorrowerFilter] = useState({
+    day: '',
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear()
+  });
+
+  // Quick Add User State
+  const [showQuickAddUser, setShowQuickAddUser] = useState(false);
+  const [quickAddTab, setQuickAddTab] = useState('manual'); // 'manual' or 'excel'
+  const [showPassword, setShowPassword] = useState(false);
+  const [createForm, setCreateForm] = useState({ fullname: '', student_id: '', password: '', role: 'student' });
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState('');
+  
+  const [importResult, setImportResult] = useState(null);
+  const [importLoading, setImportLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [editingEq, setEditingEq] = useState(null);
   const [showMaintModal, setShowMaintModal] = useState(false);
@@ -67,19 +84,23 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchTopUsers = async () => {
+  const fetchTopBorrowers = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/users/top', config);
-      setTopUsers(data);
+      const { day, month, year } = topBorrowerFilter;
+      const { data } = await axios.get(`http://localhost:5000/api/borrow/top-borrowers?day=${day}&month=${month}&year=${year}`, config);
+      setTopBorrowers(data);
     } catch (error) {
-      console.error('Lỗi khi lấy top sinh viên:', error);
+      console.error('Lỗi khi lấy top người mượn:', error);
     }
   };
 
   useEffect(() => {
     fetchData();
-    fetchTopUsers();
   }, []);
+
+  useEffect(() => {
+    fetchTopBorrowers();
+  }, [topBorrowerFilter]);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -105,6 +126,74 @@ const AdminDashboard = () => {
     } catch (error) {
       setFormMessage({ type: 'error', text: error.response?.data?.message || 'Lỗi khi tạo thiết bị' });
     }
+  };
+
+  const handleCreateUserSubmit = async (e) => {
+    e.preventDefault();
+    setCreateError('');
+    setCreateLoading(true);
+    try {
+      await axios.post('http://localhost:5000/api/users', createForm, config);
+      setCreateForm({ fullname: '', student_id: '', password: '', role: 'student' });
+      setCreateError('Tạo tài khoản thành công!');
+      fetchData();
+      fetchTopBorrowers();
+      setTimeout(() => setCreateError(''), 3000);
+    } catch (error) {
+      setCreateError(error.response?.data?.message || 'Lỗi khi tạo tài khoản');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleImportUserFile = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImportLoading(true);
+    setImportResult(null);
+
+    try {
+      const buffer = await file.arrayBuffer();
+      e.target.value = ''; // reset sau khi đọc xong
+      const wb = XLSX.read(buffer, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      if (rows.length === 0) {
+        setImportResult({ type: 'error', message: 'File Excel không có dữ liệu.' });
+        setImportLoading(false);
+        return;
+      }
+
+      const users = rows.map(r => ({
+        fullname:   String(r['ho_va_ten']     || r['Họ và Tên']              || r['fullname'] || '').trim(),
+        student_id: String(r['ma_sinh_vien']  || r['Mã Sinh Viên / MSNV']    || r['student_id'] || '').trim(),
+        password:   String(r['mat_khau']      || r['password']               || '123456').trim(),
+        role:       String(r['vai_tro']       || r['Vai trò']                || r['role'] || 'student').trim(),
+      }));
+
+      const { data } = await axios.post('http://localhost:5000/api/users/bulk-import', { users }, config);
+      setImportResult({ type: 'success', ...data });
+      fetchData();
+      fetchTopBorrowers();
+    } catch (err) {
+      setImportResult({ type: 'error', message: err.response?.data?.message || 'Lỗi khi đọc hoặc nhập file Excel.' });
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const templateData = [
+      { 'ho_va_ten': 'Nguyễn Văn A', 'ma_sinh_vien': 'sv002', 'mat_khau': '123456', 'vai_tro': 'student' },
+      { 'ho_va_ten': 'Trần Thị B',   'ma_sinh_vien': 'sv003', 'mat_khau': '123456', 'vai_tro': 'student' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    ws['!cols'] = [{ wch: 28 }, { wch: 18 }, { wch: 14 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'MauNhapSinhVien');
+    XLSX.writeFile(wb, 'MauNhapSinhVien.xlsx');
   };
 
   const handleConfirmReturn = async () => {
@@ -350,11 +439,11 @@ const AdminDashboard = () => {
                 {String.fromCharCode(64 + i)}
               </div>
             ))}
-            <div className="w-8 h-8 rounded-full border-2 border-white bg-brand-50 flex items-center justify-center text-[10px] font-bold text-brand-600">
-              +12
+            <div className="w-8 h-8 rounded-full border-2 border-white bg-brand-50 flex items-center justify-center text-[10px] font-bold text-brand-600 px-1">
+              {stats?.totalUsers ? `+${stats.totalUsers}` : '+0'}
             </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-200 text-sm">
+          <button onClick={() => { setShowQuickAddUser(true); setCreateError(''); setImportResult(null); }} className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-200 text-sm">
             <Plus size={18} />
             Thêm nhanh
           </button>
@@ -419,6 +508,17 @@ const AdminDashboard = () => {
                   record.user_id?.fullname?.toLowerCase().includes(s) ||
                   record.user_id?.student_id?.toLowerCase().includes(s)
                 );
+              }).sort((a, b) => {
+                const now = new Date().setHours(0, 0, 0, 0);
+                const dateA = new Date(a.expected_return_date).setHours(0, 0, 0, 0);
+                const dateB = new Date(b.expected_return_date).setHours(0, 0, 0, 0);
+                const aOverdue = now > dateA;
+                const bOverdue = now > dateB;
+                // Quá hạn lên trước
+                if (aOverdue && !bOverdue) return -1;
+                if (!aOverdue && bOverdue) return 1;
+                // Cùng trạng thái: sắp xếp ngày gần nhất lên trên
+                return dateA - dateB;
               }).length === 0 ? (
                 <div className="text-center py-10 px-4 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
                   <p className="text-gray-400 text-sm font-medium">Không có yêu cầu trả máy</p>
@@ -432,6 +532,17 @@ const AdminDashboard = () => {
                     record.user_id?.fullname?.toLowerCase().includes(s) ||
                     record.user_id?.student_id?.toLowerCase().includes(s)
                   );
+                }).sort((a, b) => {
+                  const now = new Date().setHours(0, 0, 0, 0);
+                  const dateA = new Date(a.expected_return_date).setHours(0, 0, 0, 0);
+                  const dateB = new Date(b.expected_return_date).setHours(0, 0, 0, 0);
+                  const aOverdue = now > dateA;
+                  const bOverdue = now > dateB;
+                  // Quá hạn lên trước
+                  if (aOverdue && !bOverdue) return -1;
+                  if (!aOverdue && bOverdue) return 1;
+                  // Cùng trạng thái: sắp xếp ngày gần nhất lên trên
+                  return dateA - dateB;
                 }).map(record => {
                   const expectedReturn = new Date(record.expected_return_date);
                   const isOverdue = new Date().setHours(0, 0, 0, 0) > expectedReturn.setHours(0, 0, 0, 0);
@@ -454,6 +565,12 @@ const AdminDashboard = () => {
                           <p className="font-bold text-xs text-gray-800 truncate">{record.user_id?.fullname}</p>
                           <p className="text-[10px] text-gray-400 leading-none">{record.user_id?.student_id}</p>
                         </div>
+                        <div className="ml-auto text-right shrink-0">
+                          <p className={`text-[10px] font-black ${isOverdue ? 'text-red-500' : 'text-gray-400'}`}>Hạn trả</p>
+                          <p className={`text-xs font-bold ${isOverdue ? 'text-red-600' : 'text-gray-600'}`}>
+                            {new Date(record.expected_return_date).toLocaleDateString('vi-VN')}
+                          </p>
+                        </div>
                       </div>
 
                       <button
@@ -471,51 +588,80 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Top Students Reputation Card */}
+          {/* Top Borrowers Card */}
           <div className="bg-white rounded-3xl p-6 shadow-xl shadow-gray-100 border border-gray-100 overflow-hidden relative h-full">
-            <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-50 rounded-full opacity-50 blur-3xl"></div>
-            <div className="flex items-center justify-between mb-6 relative">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-amber-100 text-amber-600 rounded-xl shadow-inner">
-                  <Trophy size={22} strokeWidth={2.5} />
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand-50 rounded-full opacity-50 blur-3xl"></div>
+            <div className="flex flex-col gap-4 mb-6 relative">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-brand-100 text-brand-600 rounded-xl shadow-inner">
+                    <Trophy size={22} strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Top Người mượn</h2>
                 </div>
-                <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Vinh danh</h2>
+                <div className="flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full uppercase tracking-widest border border-brand-100">
+                  <Star size={12} fill="currentColor" /> Top 5
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-100">
-                <Star size={12} fill="currentColor" /> Top 5
+
+              {/* Filters */}
+              <div className="flex gap-2">
+                <select
+                  value={topBorrowerFilter.day}
+                  onChange={e => setTopBorrowerFilter({ ...topBorrowerFilter, day: e.target.value })}
+                  className="flex-1 px-2 py-1.5 text-xs border border-gray-200 rounded-lg outline-none focus:border-brand-500"
+                >
+                  <option value="">Cả ngày</option>
+                  {[...Array(31)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>Ngày {i + 1}</option>
+                  ))}
+                </select>
+                <select
+                  value={topBorrowerFilter.month}
+                  onChange={e => setTopBorrowerFilter({ ...topBorrowerFilter, month: e.target.value })}
+                  className="flex-1 px-2 py-1.5 text-xs border border-gray-200 rounded-lg outline-none focus:border-brand-500"
+                >
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <div className="space-y-3 relative">
-              {topUsers.map((user, index) => (
-                <div key={user._id} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-brand-50/50 transition-all group border border-transparent hover:border-brand-100">
-                  <div className="relative shrink-0">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm
-                      ${index === 0 ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white ring-4 ring-amber-50' :
-                        index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-white ring-4 ring-slate-50' :
-                          index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-500 text-white ring-4 ring-orange-50' :
-                            'bg-blue-50 text-brand-600 border border-blue-100'}`}>
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : user.fullname?.charAt(0) || index + 1}
+              {topBorrowers.length === 0 ? (
+                <div className="text-center py-10 text-gray-400 text-sm italic">
+                  Chưa có dữ liệu mượn đồ trong thời gian này
+                </div>
+              ) : (
+                topBorrowers.map((item, index) => (
+                  <div key={item._id} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-brand-50/50 transition-all group border border-transparent hover:border-brand-100">
+                    <div className="relative shrink-0">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm
+                        ${index === 0 ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white ring-4 ring-amber-50' :
+                          index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-white ring-4 ring-slate-50' :
+                            index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-500 text-white ring-4 ring-orange-50' :
+                              'bg-blue-50 text-brand-600 border border-blue-100'}`}>
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : item.fullname?.charAt(0) || index + 1}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-gray-900 truncate group-hover:text-brand-600 transition-colors">{item.fullname}</h4>
+                      <p className="text-[11px] text-gray-500 font-medium tracking-tight uppercase">{item.student_id} <span className="mx-1 opacity-20">|</span> {item.class_name || 'Hệ thống'}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-black text-brand-600 leading-none">{item.borrowCount}</div>
+                      <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1">Lượt mượn</div>
                     </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-gray-900 truncate group-hover:text-brand-600 transition-colors">{user.fullname}</h4>
-                    <p className="text-[11px] text-gray-500 font-medium tracking-tight uppercase">{user.student_id} <span className="mx-1 opacity-20">|</span> {user.class_name || 'Hệ thống'}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-black text-brand-600 leading-none">{user.trust_score}</div>
-                    <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1">Điểm</div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
-            <div className="mt-6 pt-5 border-t border-dashed border-gray-100">
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-4 rounded-2xl border border-blue-100/50">
-                <p className="text-[10px] text-indigo-900 leading-relaxed font-bold italic text-center">
-                  "Điểm uy tín được tính dựa trên ý thức bảo quản thiết bị và thời gian trả máy."
-                </p>
-              </div>
+            <div className="mt-6 pt-5 border-t border-dashed border-gray-100 text-center">
+              <p className="text-[10px] text-gray-400 font-bold italic">
+                "Thống kê dựa trên tổng số lượt mượn đã thực hiện."
+              </p>
             </div>
           </div>
         </div>
@@ -1135,9 +1281,135 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      </div>
+
+      {/* Quick Add User Modal */}
+      {showQuickAddUser && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowQuickAddUser(false); }}>
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100 overflow-hidden transform transition-all animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="bg-brand-100 p-2.5 rounded-xl"><UserPlus size={22} className="text-brand-600" strokeWidth={2.5} /></div>
+                <div>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Thêm tài khoản</h2>
+                  <p className="text-xs text-brand-600 font-medium mt-0.5">Nhanh chóng thiết lập sinh viên mới trên hệ thống</p>
+                </div>
+              </div>
+              <button onClick={() => setShowQuickAddUser(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"><X size={20} /></button>
+            </div>
+
+            <div className="flex border-b border-gray-100 text-sm">
+              <button
+                className={`flex-1 py-3.5 font-bold transition-all border-b-2 flex items-center justify-center gap-2 ${quickAddTab === 'manual' ? 'border-brand-500 text-brand-600 bg-brand-50/30' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                onClick={() => { setQuickAddTab('manual'); setImportResult(null); }}
+              >
+                <Plus size={16} /> Tạo Thủ Công
+              </button>
+              <button
+                className={`flex-1 py-3.5 font-bold transition-all border-b-2 flex items-center justify-center gap-2 ${quickAddTab === 'excel' ? 'border-green-500 text-green-600 bg-green-50/30' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                onClick={() => { setQuickAddTab('excel'); setCreateError(''); }}
+              >
+                <FileUp size={16} /> Nhập từ Excel
+              </button>
+            </div>
+
+            <div className="p-6">
+              {quickAddTab === 'manual' ? (
+                <form onSubmit={handleCreateUserSubmit} className="space-y-4">
+                  {createError && (
+                    <div className={`px-4 py-3 rounded-xl text-sm flex items-start gap-2 font-medium ${createError.includes('thành công') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                      <span className="mt-0.5">{createError.includes('thành công') ? '✅' : '⚠️'}</span> {createError}
+                    </div>
+                  )}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Họ và Tên</label>
+                    <input type="text" value={createForm.fullname} onChange={e => setCreateForm({ ...createForm, fullname: e.target.value })}
+                      placeholder="VD: Nguyễn Văn Sinh" required
+                      className="w-full border-2 border-gray-100 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 bg-gray-50/50 rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder-gray-400 font-semibold" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Mã sinh viên (Tài khoản)</label>
+                    <input type="text" value={createForm.student_id} onChange={e => setCreateForm({ ...createForm, student_id: e.target.value })}
+                      placeholder="VD: sv001" required
+                      className="w-full border-2 border-gray-100 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 bg-gray-50/50 rounded-xl px-4 py-3 text-sm font-mono outline-none transition-all placeholder-gray-400 font-bold text-gray-900" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Mật khẩu</label>
+                    <div className="relative">
+                      <input type={showPassword ? 'text' : 'password'} value={createForm.password}
+                        onChange={e => setCreateForm({ ...createForm, password: e.target.value })}
+                        placeholder="Có thể dùng MSSV làm mật khẩu" required
+                        className="w-full border-2 border-gray-100 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 bg-gray-50/50 rounded-xl px-4 py-3 pr-11 text-sm outline-none transition-all font-medium" />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-600 transition-colors p-1">
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                  <button type="submit" disabled={createLoading}
+                    className={`w-full mt-2 py-3.5 rounded-xl text-white font-black transition-all uppercase tracking-widest text-sm flex justify-center items-center gap-2 ${createLoading ? 'bg-brand-400 cursor-not-allowed' : 'bg-brand-600 hover:bg-brand-700 shadow-xl shadow-brand-500/20 active:scale-[0.98]'}`}>
+                    {createLoading ? 'Đang xử lý...' : <><Plus size={18} strokeWidth={3} /> Xác Nhận Tạo</>}
+                  </button>
+                </form>
+              ) : (
+                <div className="space-y-5">
+                  <div className="bg-green-50 p-4 rounded-xl border border-green-100 flex items-start gap-3">
+                    <CheckCircle className="text-green-600 shrink-0 mt-0.5" size={20} />
+                    <div className="text-sm text-green-800">
+                      <p className="font-bold mb-1">Hướng dẫn nhập hàng loạt:</p>
+                      <ul className="list-disc pl-4 space-y-1 opacity-90 text-xs font-medium">
+                        <li>Dữ liệu bắt buộc: <b>Họ và Tên</b>, <b>Mã Sinh Viên / MSNV</b>.</li>
+                        <li>Nếu không có cột <b>Mật khẩu</b>, hệ thống tự động đặt `123456`.</li>
+                      </ul>
+                      <button onClick={handleDownloadTemplate} className="mt-3 text-xs font-bold bg-white text-green-700 px-3 py-1.5 rounded shadow-sm border border-green-200 hover:bg-green-100 transition-colors flex items-center gap-1.5 w-fit">
+                        <FileDown size={14} /> Tải file mẫu
+                      </button>
+                    </div>
+                  </div>
+
+                  {importResult && (
+                    <div className={`p-4 rounded-xl border text-sm font-medium ${importResult.type === 'success' ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                      <div className="flex gap-2 items-start">
+                        {importResult.type === 'success' ? <CheckCircle size={18} className="mt-0.5 text-green-600" /> : <AlertCircle size={18} className="mt-0.5 text-red-500" />}
+                        <div className="flex-1">
+                          <p className="font-bold">{importResult.message}</p>
+                          {importResult.errors?.length > 0 && (
+                            <div className="mt-2 text-xs opacity-80 max-h-24 overflow-y-auto space-y-1 custom-scrollbar">
+                              {importResult.errors.map((e, i) => <p key={i}>• {e}</p>)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className="border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-green-400 hover:bg-green-50/30 transition-all group flex flex-col items-center cursor-pointer"
+                    onClick={() => !importLoading && fileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".xlsx,.xls"
+                      className="hidden"
+                      onChange={handleImportUserFile}
+                      disabled={importLoading}
+                    />
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-green-200 transition-all">
+                      <Upload className="w-8 h-8 text-green-600" />
+                    </div>
+                    <p className="font-bold text-gray-900 mb-1">{importLoading ? 'Đang xử lý dữ liệu...' : 'Click hoặc kéo thả file Excel'}</p>
+                    <p className="text-xs font-medium text-gray-500">Hỗ trợ .xlsx, .xls</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
 };
 
 export default AdminDashboard;

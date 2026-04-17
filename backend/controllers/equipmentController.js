@@ -88,11 +88,13 @@ const deleteEquipment = async (req, res) => {
 
 const getDashboardStats = async (req, res) => {
   try {
+    const User = require('../models/User');
     const totalCount = await Equipment.countDocuments();
     const borrowedCount = await Equipment.countDocuments({ status: 'borrowed' });
     const maintenanceCount = await Equipment.countDocuments({ status: 'maintenance' });
     const availableCount = await Equipment.countDocuments({ status: 'available' });
-    res.json({ totalCount, availableCount, borrowedCount, maintenanceCount });
+    const totalUsers = await User.countDocuments();
+    res.json({ totalCount, availableCount, borrowedCount, maintenanceCount, totalUsers });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

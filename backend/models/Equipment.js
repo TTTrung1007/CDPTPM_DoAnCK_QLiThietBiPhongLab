@@ -20,7 +20,7 @@ const equipmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['available', 'borrowed', 'maintenance', 'broken', 'lost', 'retired'],
+    enum: ['available', 'borrowed', 'maintenance', 'broken', 'lost', 'retired', 'reserved'],
     default: 'available',
   },
   specs: {

@@ -9,7 +9,7 @@ const AuditLogViewer = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
       const response = await axios.get('http://localhost:5000/api/audit-logs', {
         headers: { Authorization: `Bearer ${token}` }
       });

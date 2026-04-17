@@ -28,6 +28,18 @@ const createReservation = async (req, res) => {
       return res.status(400).json({ message: 'Thiết bị đã có người đặt trong khoảng thời gian này.' });
     }
 
+    // Check with active borrowing
+    const BorrowRecord = require('../models/BorrowRecord');
+    const activeBorrow = await BorrowRecord.findOne({
+      equipment_id,
+      status: 'active',
+      expected_return_date: { $gt: start }
+    });
+
+    if (activeBorrow) {
+      return res.status(400).json({ message: 'Thiết bị đang được mượn và sẽ trả sau thời gian bắt đầu của bạn. Vui lòng chọn lúc khác.' });
+    }
+
     const reservation = await Reservation.create({
       user_id: req.user._id,
       equipment_id,

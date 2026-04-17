@@ -195,10 +195,36 @@ const getTopUsers = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const { fullname, student_id, role, password } = req.body;
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+
+    if (user.student_id === 'admin' && student_id && student_id !== 'admin') {
+      return res.status(400).json({ message: 'Không thể thay đổi mã của admin gốc' });
+    }
+
+    if (fullname) user.fullname = fullname;
+    if (student_id) user.student_id = student_id;
+    if (role) user.role = role;
+    if (password) user.password = password; // pre-save hook in user model will hash it
+
+    const updatedUser = await user.save();
+    res.json({ message: 'Cập nhật tài khoản thành công', user: { _id: updatedUser._id, fullname: updatedUser.fullname, student_id: updatedUser.student_id, role: updatedUser.role } });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Mã số sinh viên (Tài khoản) đã tồn tại trong hệ thống.' });
+    }
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = { 
   getUsers, 
   updateUserStatus, 
   createUser, 
+  updateUser,
   deleteUser, 
   bulkCreateUsers,
   getUserProfile,

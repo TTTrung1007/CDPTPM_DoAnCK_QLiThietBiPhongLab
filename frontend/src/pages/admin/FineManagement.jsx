@@ -7,7 +7,7 @@ const FineManagement = () => {
 
   const fetchFines = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
       const response = await axios.get('http://localhost:5000/api/fines', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -20,7 +20,7 @@ const FineManagement = () => {
   const handleAction = async (id, actionType) => {
     if (!window.confirm(`Xác nhận ${actionType === 'pay' ? 'đã thu tiền' : 'tha phạt'}?`)) return;
     try {
-        const token = localStorage.getItem('token');
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         await axios.put(`http://localhost:5000/api/fines/${id}/${actionType}`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });

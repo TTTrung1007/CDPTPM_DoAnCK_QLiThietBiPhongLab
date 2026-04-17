@@ -7,7 +7,7 @@ const FeedbackManagement = () => {
 
   const fetchFeedbacks = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
       const response = await axios.get('http://localhost:5000/api/feedbacks', {
         headers: { Authorization: `Bearer ${token}` }
       });

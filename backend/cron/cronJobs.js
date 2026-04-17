@@ -2,6 +2,8 @@ const cron = require('node-cron');
 const BorrowRecord = require('../models/BorrowRecord');
 const Fine = require('../models/Fine');
 const User = require('../models/User');
+const Reservation = require('../models/Reservation');
+const Equipment = require('../models/Equipment');
 
 const initCronJobs = () => {
   // Chạy mỗi phút cho mục đích kiểm thử (test). Thực tế nên để '1 0 * * *' (00:01 mỗi ngày)
@@ -47,6 +49,45 @@ const initCronJobs = () => {
       }
       if (overdueRecords.length === 0) {
         console.log('[CRON] Không có thiết bị quá hạn mới.');
+      }
+
+      // --- XỬ LÝ LỊCH ĐẶT CHỖ ---
+      // 1. Tự động chuyển thành "BorrowRecord" (Đang mượn) nếu đến giờ đặt chỗ
+      const activeReservations = await Reservation.find({
+        status: 'confirmed',
+        startTime: { $lte: now },
+        endTime: { $gt: now }
+      });
+      for (const res of activeReservations) {
+        const eq = await Equipment.findById(res.equipment_id);
+        if (eq && (eq.status === 'available' || eq.status === 'reserved')) {
+          res.status = 'completed';
+          await res.save();
+
+          const record = await BorrowRecord.create({
+            user_id: res.user_id,
+            equipment_id: res.equipment_id,
+            expected_return_date: res.endTime
+          });
+
+          eq.status = 'borrowed';
+          eq.borrow_count = (eq.borrow_count || 0) + 1;
+          await eq.save();
+          console.log(`[CRON] Đã tự động mượn thiết bị ${eq.name} cho user ${res.user_id}`);
+        } else if (eq) {
+          res.status = 'cancelled';
+          await res.save();
+        }
+      }
+
+      // 2. Cập nhật lịch đặt chỗ hết hạn -> "expired" (nếu có trường hợp bị lọt)
+      const expiredReservations = await Reservation.find({
+        status: 'confirmed',
+        endTime: { $lte: now }
+      });
+      for (const res of expiredReservations) {
+        res.status = 'expired';
+        await res.save();
       }
     } catch (error) {
       console.error('[CRON] Lỗi:', error);
