@@ -1,78 +1,119 @@
-# Hệ Thống Quản Lý Thiết Bị Phòng Lab (QR Management System)
+# 🛡️ LabHub QR v3.5 - Hệ Thống Quản Lý Thiết Bị Phòng Lab Thông Minh
 
-Chào mừng bạn đến với dự án **Hệ Thống Quản Lý Thiết Bị Phòng Lab**. Đây là một ứng dụng web toàn diện được xây dựng trên nền tảng MERN Stack, được thiết kế để đơn giản hóa việc quản lý, theo dõi và mượn trả thiết bị trong các phòng thí nghiệm thông qua mã QR.
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-## 🌟 Tính năng chính
-
-### dành cho Quản trị viên (Admin)
-- **Bảng điều khiển thông minh:** Theo dõi tổng quan số lượng thiết bị, tình trạng mượn trả và các thông số hoạt động.
-*   **Quản lý thiết bị:** Thêm, sửa, xóa thiết bị và phân loại theo phòng Lab hoặc danh mục.
-- **Quản lý người dùng:** Quản lý danh sách sinh viên/giảng viên, lịch sử mượn và uy tín của người dùng.
-- **Phân tích dữ liệu:** Biểu đồ thống kê tần suất sử dụng thiết bị và báo cáo vi phạm (Fine system).
-- **Hệ thống QR:** Tự động tạo và in mã QR cho từng thiết bị để quản lý nhanh chóng.
-
-### dành cho Người dùng (Sinh viên/Giảng viên)
-- **Danh mục thiết bị:** Tìm kiếm, lọc và xem thông tin chi tiết thiết bị một cách trực quan.
-- **Mượn/Trả thiết bị:** Quy trình đặt chỗ (Reservation) và mượn thiết bị linh hoạt.
-- **Quét mã QR:** Sử dụng camera để quét mã QR trên thiết bị để xem thông tin hoặc thực hiện mượn/trả nhanh.
-- **Lịch sử cá nhân:** Theo dõi lịch sử mượn trả, thông báo và trạng thái các yêu cầu.
-
-## 🛠 Công nghệ sử dụng
-
-- **Frontend:** React.js, Vite, Tailwind CSS, Lucide React, Recharts.
-- **Backend:** Node.js, Express.js.
-- **Database:** MongoDB (Mongoose).
-- **Tính năng đặc biệt:** QR Code generation & scanning, Node-cron (quản lý tác vụ định kỳ).
-
-## 🚀 Hướng dẫn cài đặt
-
-### Yêu cầu hệ thống
-- Node.js (v16 trở lên)
-- MongoDB (Local hoặc Atlas)
-
-### Cài đặt Backend
-1. Di chuyển vào thư mục backend:
-   ```bash
-   cd backend
-   ```
-2. Cài đặt các gói phụ thuộc:
-   ```bash
-   npm install
-   ```
-3. Tạo file `.env` và cấu hình các biến môi trường (PORT, MONGODB_URI, JWT_SECRET).
-4. Khởi chạy server:
-   ```bash
-   npm run dev
-   ```
-
-### Cài đặt Frontend
-1. Di chuyển vào thư mục frontend:
-   ```bash
-   cd frontend
-   ```
-2. Cài đặt các gói phụ thuộc:
-   ```bash
-   npm install
-   ```
-3. Khởi chạy ứng dụng:
-   ```bash
-   npm run dev
-   ```
-
-## 📁 Cấu trúc thư mục
-
-```text
-HeThongQuanLyThietBiLab/
-├── backend/            # Mã nguồn phía máy chủ (API, Models, Controllers)
-├── frontend/           # Mã nguồn phía người dùng (React components, Pages)
-├── database_backup/    # Các bản sao lưu và dữ liệu mẫu
-├── README.md           # Tài liệu hướng dẫn dự án
-└── .gitignore          # Cấu hình các tệp tin bỏ qua khi upload git
-```
-
-## 📝 Giấy phép
-
-Dự án này được phát triển cho mục đích học tập và quản lý nội bộ.
+**LabHub QR** là giải pháp quản lý thiết bị phòng thí nghiệm toàn diện dựa trên mã QR, giúp tối ưu hóa quy trình mượn trả, theo dõi tình trạng thiết bị và quản lý người dùng một cách chuyên nghiệp và hiệu quả.
 
 ---
-**Phát triển bởi [TTTrung1007](https://github.com/TTTrung1007)**
+
+## 🌟 Tính năng Nổi bật
+
+### 🛠️ Dành cho Quản trị viên (Admin)
+- **Bảng điều khiển Tổng lực (Admin Power):** Theo dõi thời gian thực tình trạng thiết bị, mượn trả và các báo cáo vi phạm.
+- **Quản lý QR Code Tập trung:** Tự động tạo mã QR chất lượng cao cho hàng nghìn thiết bị, hỗ trợ in ấn hàng loạt.
+- **Kiểm soát Tình trạng Thiết bị:** Hệ thống đánh giá % tình trạng (Condition evaluation) khi trả máy, tự động chuyển sang chế độ bảo trì nếu chất lượng thấp.
+- **Quản lý Danh mục & Kho:** Phân quyền quản lý theo nhiều phòng Lab, Xưởng hoặc Kho lưu trữ.
+- **Excel Power:** Nhập/Xuất dữ liệu hàng loạt từ file Excel chỉ trong vài giây.
+- **Hệ thống Phạt (Fine System):** Tự động tính toán lỗi vi phạm và quản lý các khoản phạt nếu trả chậm hoặc làm hỏng thiết bị.
+
+### 🎓 Dành cho Người dùng (Sinh viên/Giảng viên)
+- **Danh mục Thiết bị Trực quan:** Tìm kiếm, lọc theo danh mục dạng Dropdown hiện đại, xem thông tin chi tiết với ảnh Live Preview.
+- **Quy trình Mượn/Đặt chỗ:** Đặt chỗ trước (Reservation) cho các thiết bị đang bận hoặc mượn ngay các thiết bị sẵn có.
+- **Giỏ mượn Thông minh:** Cho phép chọn nhiều thiết bị và mượn cùng lúc (Bulk Borrow) cực nhanh.
+- **Quét mã QR:** Sử dụng camera di động để xem thông tin thiết bị hoặc thực hiện mượn/trả nhanh tại chỗ.
+- **Hệ thống Uy tín (Reputation):** Càng trả đồ đúng hạn, điểm uy tín càng cao, giúp tăng cơ hội mượn các thiết bị cao cấp.
+
+---
+
+## ⚙️ Kiến trúc Hệ thống
+
+```mermaid
+graph TD
+    A[Client - React SPA] -->|Axios / REST| B[API Server - Node/Express]
+    B -->|Mongoose| C[Database - MongoDB Local/Atlas]
+    B -->|JWT| D[Auth Service]
+    B -->|QR Generator| E[QR Code Engine]
+    B -->|Node-cron| F[Overdue Task Scheduler]
+```
+
+---
+
+## 🛠️ Công nghệ Sử dụng
+
+- **Frontend:** React Context API, Vite, Tailwind CSS, Lucide React (Icons), Recharts (Biểu đồ).
+- **Backend:** Node.js, Express.js, Mongoose, JWT (Xác thực), Nodemon.
+- **Database:** MongoDB (Local Community Server / Shared In-Memory DB).
+- **Automation:** Node-cron (Kiểm tra trả chậm mỗi 15 phút).
+
+---
+
+## 🚀 Hướng dẫn Cài đặt & Khởi chạy
+
+### 1. Yêu cầu Hệ thống
+- **Node.js**: Phiên bản 16.x trở lên.
+- **MongoDB**: Phiên bản 4.x trở lên (Đã bật dịch vụ mongod).
+
+### 2. Cài đặt các thư viện
+Mở Terminal và chạy các lệnh sau:
+
+```bash
+# Cài đặt cho Backend
+cd backend
+npm install
+
+# Cài đặt cho Frontend
+cd ../frontend
+npm install
+```
+
+### 3. Cấu hình Môi trường
+Tạo file `.env` trong thư mục `backend` với nội dung sau:
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/lab-equipment-db
+JWT_SECRET=supersecret123
+FRONTEND_URL=http://localhost:5173
+```
+
+### 4. Chạy Ứng dụng
+Chạy đồng thời 2 Terminal:
+
+**Terminal 1 (Backend):**
+```bash
+cd backend
+npm run dev
+```
+
+**Terminal 2 (Frontend):**
+```bash
+cd frontend
+npm run dev
+```
+
+---
+
+## 📁 Cấu trúc Thư mục
+```text
+HeThongQuanLyThietBiLab/
+├── backend/            # API Server (Controllers, Models, Middleware, Cron)
+├── frontend/           # UI Application (React, Tailwind, Assets)
+├── database_backup/    # Script nạp dữ liệu và bản lưu trữ JSON
+├── README.md           # Tài liệu dự án
+└── .gitignore          # Cấu hình bỏ qua tệp tin
+```
+
+---
+
+## 👥 Đội ngũ Phát triển - Nhóm 4
+
+Dự án được thực hiện và duy trì bởi các thành viên:
+
+1.  **Trịnh Tiến Trung** - [Github Profile](https://github.com/TTTrung1007)
+2.  **Tằng Mằn Pố** - [Github Profile](https://github.com/tangpo1273)
+3.  **Vũ Phương Thảo**
+
+---
+**© 2026 LabHub Team. Phát triển cho mục đích giáo dục và quản lý nội bộ.**

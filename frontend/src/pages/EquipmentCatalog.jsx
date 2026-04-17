@@ -140,57 +140,43 @@ const EquipmentCatalog = () => {
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 text-sm outline-none transition-all"
             />
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {[
-              { key: 'all', label: 'Tất cả trạng thái' },
-              { key: 'available', label: '✅ Sẵn sàng' },
-              { key: 'borrowed', label: '🟡 Đang mượn' },
-              { key: 'maintenance', label: '🔴 Bảo trì' },
-            ].map(f => (
-              <button
-                key={f.key}
-                onClick={() => setFilterStatus(f.key)}
-                className={`px-4 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all whitespace-nowrap
-                  ${filterStatus === f.key ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+          <div className="flex gap-2 flex-wrap min-w-[180px]">
+            <div className="relative w-full sm:w-auto">
+              <select
+                value={filterStatus}
+                onChange={e => setFilterStatus(e.target.value)}
+                className="w-full sm:w-48 appearance-none pl-4 pr-10 py-2.5 rounded-xl border-2 border-gray-200 focus:border-brand-500 bg-white text-sm font-semibold text-gray-700 outline-none transition-all cursor-pointer hover:border-gray-300"
               >
-                {f.label}
-              </button>
-            ))}
+                <option value="all">Tất cả trạng thái</option>
+                <option value="available">✅ Sẵn sàng</option>
+                <option value="borrowed">🟡 Đang mượn</option>
+                <option value="maintenance">🔴 Bảo trì</option>
+              </select>
+              <ChevronRight size={16} className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
+            </div>
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          <div className="flex items-center gap-2 text-gray-400 shrink-0 mr-2">
+        {/* Category Filter Dropdown */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-gray-400 shrink-0">
             <Filter size={16} />
             <span className="text-xs font-bold uppercase tracking-wider">Danh mục:</span>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setFilterCategory('all')}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border
-                ${filterCategory === 'all' 
-                  ? 'bg-gray-900 text-white border-gray-900 shadow-md' 
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+          <div className="relative flex-1 sm:flex-initial">
+             <select
+              value={filterCategory}
+              onChange={e => setFilterCategory(e.target.value)}
+              className="w-full sm:w-64 appearance-none pl-4 pr-10 py-2 rounded-xl border-2 border-brand-100 focus:border-brand-500 bg-white text-sm font-bold text-gray-700 outline-none transition-all cursor-pointer hover:border-brand-200"
             >
-              Tất cả
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat._id}
-                onClick={() => setFilterCategory(cat._id)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border flex items-center gap-2
-                  ${filterCategory === cat._id 
-                    ? 'bg-brand-600 text-white border-brand-600 shadow-md' 
-                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
-              >
-                <div 
-                  className="w-2 h-2 rounded-full" 
-                  style={{ backgroundColor: cat.color || '#3b82f6' }}
-                />
-                {cat.name}
-              </button>
-            ))}
+              <option value="all">Tất cả danh mục</option>
+              {categories.map(cat => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <ChevronRight size={16} className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
           </div>
         </div>
       </div>
