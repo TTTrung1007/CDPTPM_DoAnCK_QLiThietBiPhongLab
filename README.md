@@ -113,7 +113,7 @@ Dự án được thực hiện và duy trì bởi các thành viên:
 
 1.  **Trịnh Tiến Trung** - [Github Profile](https://github.com/TTTrung1007)
 2.  **Tằng Mằn Pố** - [Github Profile](https://github.com/tangpo1273)
-3.  **Vũ Phương Thảo**
+3.  **Vũ Phương Thảo** - [Github Profile](https://github.com/suznvu010803-code)
 
 ---
 **© 2026 LabHub Team. Phát triển cho mục đích giáo dục và quản lý nội bộ.**

@@ -89,5 +89,8 @@ Dự án **LabHub QR v3.5** là sự kết hợp hoàn hảo giữa công nghệ
 ---
 
 > [!TIP]
-> **Tài liệu này được biên soạn tự động để tổng kết toàn bộ thành quả của quá trình phát triển.**
-> **Liên hệ**: Administrator để biết thêm thông tin chi tiết về mã nguồn.
+> **Tài liệu này được biên soạn bởi Nhóm 4 để tổng kết toàn bộ thành quả của quá trình phát triển.**
+> **Liên hệ**:
+> - **Trịnh Tiến Trung**
+> - **Tằng Mằn Pố**
+> - **Vũ Phương Thảo** ([GitHub: suznvu010803-code](https://github.com/suznvu010803-code))

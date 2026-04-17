@@ -33,7 +33,7 @@ Tài liệu này tổng kết các công việc đã thực hiện và trạng t
 Hệ thống được xây dựng và duy trì bởi:
 1. **Trịnh Tiến Trung** (Leader) - [GitHub: TTTrung1007](https://github.com/TTTrung1007)
 2. **Tằng Mằn Pố** - [GitHub: tangpo1273](https://github.com/tangpo1273)
-3. **Vũ Phương Thảo**
+3. **Vũ Phương Thảo** - [GitHub: suznvu010803-code](https://github.com/suznvu010803-code)
 
 ---
 

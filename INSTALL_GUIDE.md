@@ -67,4 +67,10 @@ npm run dev
 - **Mật khẩu**: `123456`
 
 ---
-**Lưu ý**: Nếu gặp lỗi không nhận diện lệnh `node` hay `npm`, hãy kiểm tra xem bạn đã thêm Node.js vào **Environment Variables (PATH)** của Windows chưa.
+---
+**Mọi thắc mắc về cài đặt vui lòng liên hệ Nhóm 4:**
+- **Trịnh Tiến Trung**
+- **Tằng Mằn Pố**
+- **Vũ Phương Thảo** ([GitHub: suznvu010803-code](https://github.com/suznvu010803-code))
+
+Lưu ý: Nếu gặp lỗi không nhận diện lệnh `node` hay `npm`, hãy kiểm tra xem bạn đã thêm Node.js vào **Environment Variables (PATH)** của Windows chưa.
