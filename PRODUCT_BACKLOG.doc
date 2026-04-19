@@ -1,0 +1,232 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>Product Backlog</title>
+  <!--[if gte mso 9]>
+  <xml>
+    <w:WordDocument>
+      <w:View>Print</w:View>
+      <w:Zoom>100</w:Zoom>
+      <w:DoNotOptimizeForBrowser/>
+    </w:WordDocument>
+  </xml>
+  <![endif]-->
+  <style>
+    body { font-family: "Times New Roman", serif; font-size: 13pt; }
+    h1 { text-align: center; color: #2c3e50; font-family: "Arial", sans-serif; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1pt solid #000000; padding: 8px; vertical-align: top; }
+    th { background-color: #e1e8ed; font-weight: bold; text-align: left; }
+    ul { margin-top: 0; padding-left: 15px; }
+  </style>
+</head>
+<body>
+
+  <h1>PRODUCT BACKLOG - DỰ ÁN LABHUB QR</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 5%;">ID</th>
+        <th style="width: 15%;">As a &lt;&lt;user&gt;&gt;</th>
+        <th style="width: 25%;">I want &lt;&lt;something&gt;&gt;</th>
+        <th style="width: 20%;">So that &lt;&lt;benefit&gt;&gt;</th>
+        <th style="width: 5%;">Story Point</th>
+        <th style="width: 5%;">Priority</th>
+        <th style="width: 25%;">Acceptance Criteria</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>US-01</b></td>
+        <td>Người sử dụng (Chung)</td>
+        <td>Đăng nhập an toàn vào hệ thống bằng tên tài khoản và mật khẩu định danh.</td>
+        <td>Hệ thống biết tôi là ai (Admin, Giảng viên hay Sinh viên) để phân quyền chức năng tương ứng.</td>
+        <td>5</td>
+        <td>Highest</td>
+        <td>
+          <ul>
+            <li>Đăng nhập thành công trả về JWT Token.</li>
+            <li>Sai mật khẩu báo lỗi trên UI.</li>
+            <li>Mật khẩu trong Database phải được băm (bcrypt).</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-02</b></td>
+        <td>Quản trị viên (Admin)</td>
+        <td>Quản lý sổ cái danh sách toàn bộ Sinh viên/Người mượn.</td>
+        <td>Cấp mới tài khoản, khóa hoặc reset mật khẩu cho các sinh viên làm mất thẻ.</td>
+        <td>3</td>
+        <td>High</td>
+        <td>
+          <ul>
+            <li>Màn hình hiển thị Grid danh sách User.</li>
+            <li>Có nút thêm/Xóa tài khoản Sinh viên.</li>
+            <li>Chặn xóa tài khoản sinh viên đang giữ thiết bị chưa trả.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-03</b></td>
+        <td>Sinh viên / Học viên</td>
+        <td>Xem và cuộn trang thiết bị dạng ô lưới (Grid Card) mượt mà.</td>
+        <td>Tìm đồ/linh kiện cần làm đồ án dễ dàng và trực quan.</td>
+        <td>3</td>
+        <td>High</td>
+        <td>
+          <ul>
+            <li>Hiển thị UI dạng thẻ lưới có ảnh thumbnail.</li>
+            <li>Trạng thái xanh lá "Có sẵn", màu vàng "Đang mượn".</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-04</b></td>
+        <td>Người sử dụng (Chung)</td>
+        <td>Thanh Lọc & Phân loại đa tầng (Theo trạng thái / Theo nhóm máy).</td>
+        <td>Lọc nhanh các "Máy chiếu" đang "Rảnh" chỉ với 2 click chuột.</td>
+        <td>5</td>
+        <td>High</td>
+        <td>
+          <ul>
+            <li>Dropdown phân loại theo nhóm.</li>
+            <li>Checkbox lọc thiết bị đang Bận/Rảnh (Real-time filter).</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-05</b></td>
+        <td>Quản trị viên (Admin)</td>
+        <td>Thêm máy móc mới với hệ thống tự động ép khuôn mã QR Code.</td>
+        <td>Dễ dàng in ấn decal QR dán dính luôn vào thân thùng máy.</td>
+        <td>8</td>
+        <td>Highest</td>
+        <td>
+          <ul>
+            <li>Tự động gen QR Base64 ngay khi Insert thành công.</li>
+            <li>Upload ảnh minh họa thiết bị.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-06</b></td>
+        <td>Quản trị viên (Admin)</td>
+        <td>Import/Export kho thiết bị qua file Excel (Excel Bulk Import).</td>
+        <td>Kiểm kê tài sản hoặc thêm hàng loạt thiết bị mới cho kho.</td>
+        <td>5</td>
+        <td>Medium</td>
+        <td>
+          <ul>
+            <li>Tải lên file .xlsx / .csv.</li>
+            <li>Bỏ qua dữ liệu trùng lặp số Serial.</li>
+            <li>Tải xuống báo cáo xuất kho.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-07</b></td>
+        <td>Sinh viên / Học viên</td>
+        <td>Xác thực mượn thiết bị bằng cách bật Camera quét thẳng vào tem QR trên máy (Core Feature).</td>
+        <td>Đảm bảo sinh viên đang có mặt thực sự tại phòng Lab, chống mượn đồ giả vờ từ xa.</td>
+        <td>13</td>
+        <td>Highest</td>
+        <td>
+          <ul>
+            <li>Tích hợp html5-qrcode mở camera quét trực tiếp.</li>
+            <li>Báo lỗi đỏ nếu QR không khớp serial thiết bị.</li>
+            <li>Giao diện hiện Form hẹn ngày trả ngay trên màn hình.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-08</b></td>
+        <td>Sinh viên / Học viên</td>
+        <td>Đặt chỗ trước (Reservation/Booking) thiết bị đang bị người khác "giữ".</td>
+        <td>Đảm bảo có máy xài vào tuần sau ngay khi người mượn cũ nộp trả.</td>
+        <td>8</td>
+        <td>Medium</td>
+        <td>
+          <ul>
+            <li>Nút "Đặt Chỗ" (Reserve).</li>
+            <li>Chặn các lịch đặt bị trùng thời điểm (Conflict booking).</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-09</b></td>
+        <td>Quản trị viên (Admin)</td>
+        <td>Nghiệm thu trả đồ kèm thanh trượt đánh giá Tình Trạng % của thiết bị.</td>
+        <td>Lưu bằng chứng % hư hao thiết bị để lên phương án bảo trì sửa chữa.</td>
+        <td>5</td>
+        <td>High</td>
+        <td>
+          <ul>
+            <li>Kéo Slider (0-100%) khi duyệt phiếu trả thiết bị.</li>
+            <li>Tự động chuyển thành trạng thái "Bảo trì" nếu mức độ dưới 50%.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-10</b></td>
+        <td>Hệ thống (Tự động)</td>
+        <td>Chạy tiến trình tự động gắn cờ lố hạn (Overdue) mỗi ngày.</td>
+        <td>Nhắc nhở, tính phạt sinh viên trễ hẹn để nuôi dưỡng hệ sinh thái Lab uy tín.</td>
+        <td>5</td>
+        <td>Low</td>
+        <td>
+          <ul>
+            <li>Lưu trữ số ngày Overdue.</li>
+            <li>Gắn màu cảnh báo Đỏ trên màn hình Admin.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-11</b></td>
+        <td>Sinh viên / Học viên</td>
+        <td>Đánh giá (Review/Rating) 1 đến 5 sao thiết bị sau khi xài xong.</td>
+        <td>Để cảnh báo máy tính lag/chậm hoặc góp ý cho khóa sau.</td>
+        <td>3</td>
+        <td>Low</td>
+        <td>
+          <ul>
+            <li>Nút Đánh giá sáng lên trên Phiếu Đã trả.</li>
+            <li>Cung cấp điểm số sao và dòng bình luận ngắn.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-12</b></td>
+        <td>Quản trị viên (Admin)</td>
+        <td>Xem Dashboard trực quan biểu đồ hình tròn phân phối tỷ lệ tài sản thiết bị.</td>
+        <td>Làm báo cáo tổng quát gửi lên Ban giám hiệu mà không cần đếm lại kho.</td>
+        <td>5</td>
+        <td>Medium</td>
+        <td>
+          <ul>
+            <li>Sử dụng Recharts sinh biểu đồ.</li>
+            <li>Hiển thị % máy móc Đang Bận / Đang Rảnh / Hỏng.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><b>US-13</b></td>
+        <td>Hệ thống (Bảo mật)</td>
+        <td>Ghi nhật ký Event Sourcing (Audit Log) các hành động quan trọng (Sửa/Xóa).</td>
+        <td>Truy vết ai/lúc nào đã lén xóa phiếu mượn đồ trái phép.</td>
+        <td>8</td>
+        <td>Medium</td>
+        <td>
+          <ul>
+            <li>Ghi nhận thao tác, IP, Timestamp.</li>
+            <li>Admin không thể xóa được dòng Audit Log để phi tang.</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>GitHub User Guide</title>
+  <!--[if gte mso 9]>
+  <xml>
+    <w:WordDocument>
+      <w:View>Print</w:View>
+      <w:Zoom>100</w:Zoom>
+      <w:DoNotOptimizeForBrowser/>
+    </w:WordDocument>
+  </xml>
+  <![endif]-->
+  <style>
+    body { font-family: "Times New Roman", serif; font-size: 14pt; line-height: 1.5; padding: 20px; }
+    h1 { text-align: center; color: #238636; font-family: "Arial", sans-serif; font-size: 20pt; border-bottom: 2pt solid #2ea043; padding-bottom: 10px;}
+    h2 { color: #1f2328; font-family: "Arial", sans-serif; font-size: 16pt; margin-top: 20px; }
+    h3 { color: #1f2328; font-family: "Arial", sans-serif; font-size: 14pt; margin-top: 15px; margin-bottom: 5px; text-decoration: underline;}
+    ul, ol { margin-top: 5px; padding-left: 25px; }
+    li { margin-bottom: 8px; }
+    .code-block { background-color: #f6f8fa; border: 1pt solid #d0d7de; padding: 10px; font-family: "Courier New", monospace; font-size: 12pt; display: block; margin: 10px 0;}
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1pt solid #d0d7de; padding: 8px; text-align: left; }
+    th { background-color: #f6f8fa; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>QUY TRÌNH QUẢN LÝ MÃ NGUỒN VỚI GITHUB</h1>
+  <p style="text-align: center; font-style: italic;">Dự án: LabHub QR - Thực hiện bởi Nhóm 4</p>
+
+  <h2>1. Phân Công & Vai Trò (Roles)</h2>
+  <ul>
+    <li><b>Trịnh Tiến Trung (Leader):</b> Quản lý Repository chính trên nền tảng GitHub. Chịu trách nhiệm Review code, duyệt các Pull Request (PR) và Merge mã nguồn vào nhánh <code>main</code>.</li>
+    <li><b>Tằng Mằn Pố (Developer):</b> Phụ trách thiết kế mô hình dữ liệu (Database Schema), phát triển logic Backend (Node.js/Express) và thiết lập API quy trình mượn trả QR.</li>
+    <li><b>Vũ Phương Thảo (Developer):</b> Triển khai giao diện người dùng Frontend (React/Vite), thiết kế đồ họa (UI/UX) và duy trì tài liệu dự án.</li>
+  </ul>
+
+  <h2>2. Mô Hình Làm Việc (Git Flow)</h2>
+  <p>Nhóm áp dụng mô hình phân nhánh đơn giản và hiệu quả nhất cho làm việc nhóm trực tuyến:</p>
+  <ol>
+    <li><b>Cập nhật mã nguồn mới nhất:</b> Mỗi khi bắt đầu ca làm việc, mọi thành viên đều phải lấy code mới nhất từ nhánh chính để tránh xung đột (conflict).</li>
+    <li><b>Tạo nhánh tính năng (Branching):</b> Tuyệt đối không viết code trực tiếp trên nhánh main. Cần phân ra các nhánh tính năng (Ví dụ: nhánh giao diện QR, nhánh sửa lỗi đăng nhập...).</li>
+    <li><b>Phát triển & Lưu cục bộ:</b> Code, kiểm tra chạy thử và chuẩn bị đóng gói ghi chú code cục bộ (Commit).</li>
+    <li><b>Đẩy lên máy chủ:</b> Pushing mã nguồn lên nhánh con trên tài khoản GitHub (Push).</li>
+    <li><b>Duyệt và Tích hợp:</b> Người viết code sẽ mở <b>Pull Request</b>, Leader (Trịnh Tiến Trung) sẽ xem xét code (Code Review), nếu chạy tốt sẽ nhấn <b>Merge</b> gộp vào nhánh chính.</li>
+  </ol>
+
+  <h2>3. Quy Tắc Ghi Chú (Commit Convention)</h2>
+  <p>Mỗi commit của nhóm phải rành mạch để sau này nhìn lại lịch sử dễ dàng gỡ lỗi, tuân thủ các tiền tố sau:</p>
+  <table>
+    <tr>
+      <th style="width: 20%;">Tiền tố (Prefix)</th>
+      <th>Ý nghĩa / Phạm vi áp dụng</th>
+    </tr>
+    <tr>
+      <td><b>feat:</b></td>
+      <td>Làm ra một tính năng hoàn toàn mới (Ví dụ: Thêm tính năng đăng nhập).</td>
+    </tr>
+    <tr>
+      <td><b>fix:</b></td>
+      <td>Sửa chữa một lỗi (Bug) của hệ thống (Ví dụ: Sửa lỗi không nhận diện được ngày trả).</td>
+    </tr>
+    <tr>
+      <td><b>docs:</b></td>
+      <td>Cập nhật cấu hình, viết README, tài liệu hướng dẫn nhóm.</td>
+    </tr>
+    <tr>
+      <td><b>style:</b></td>
+      <td>Chỉnh sửa CSS, định dạng giao diện,... không làm ảnh hưởng luồng Code logic.</td>
+    </tr>
+    <tr>
+      <td><b>refactor:</b></td>
+      <td>Cấu trúc lại code cho chạy nhanh hơn, gọn hơn.</td>
+    </tr>
+  </table>
+
+  <!-- PHẦN HƯỚNG DẪN CHI TIẾT ĐƯỢC THÊM MỚI THEO YÊU CẦU CỦA USER -->
+  <h2>4. Hướng Dẫn Sử Dụng Các Công Cụ Git/GitHub</h2>
+  <p>Đối với các thành viên phát triển nghiệp vụ, bắt buộc phải sử dụng thành thạo một trong hai phương pháp dưới đây để đồng bộ code:</p>
+
+  <h3>A. Sử dụng kết hợp VS Code (Giao diện Graphic) - Khuyên dùng</h2>
+  <ul>
+    <li><b>Bước 1:</b> Mở thanh <b>Source Control</b> bằng phím tắt <code>Ctrl + Shift + G</code> bên lề trái màn hình.</li>
+    <li><b>Bước 2 (Staging):</b> Các tệp vừa lập trình xong sẽ nằm ở mục "Changes". Ấn biểu tượng dấu cộng <code>(+)</code> để đẩy lên (add) mục "Staged Changes".</li>
+    <li><b>Bước 3 (Commit):</b> Điền thông điệp (Ví dụ: <i>feat: thiết kế xong form đăng nhập</i>) vào ô Message và ấn nút <b>Commit</b>.</li>
+    <li><b>Bước 4 (Push):</b> Nhấn vào nút xổ xuống bên cạnh chữ Commit và chọn <b>Push</b>, hoặc ấn thẳng nút <b>Sync Changes</b> (Đồng bộ) cực kỳ thuận tiện để đưa Code lên GitHub.</li>
+  </ul>
+
+  <h3>B. Sử dụng dòng lệnh Terminal (CLI Base)</h2>
+  <p>Sử dụng các lệnh này tại <code>New Terminal</code> của VS Code (Ctrl + `):</p>
+  <ul>
+    <li><b>Kiểm tra những file mình đã sửa nhầm:</b> 
+      <span class="code-block">git status</span></li>
+    <li><b>Lấy toàn bộ code mới nhất của Tiến Trung/Phương Thảo về máy mình:</b> 
+      <span class="code-block">git pull origin main</span></li>
+    <li><b>Mở một nhánh mới để làm việc an toàn, ko dính dáng nhánh khác:</b> 
+      <span class="code-block">git checkout -b feature/sua-loi-man-hinh</span></li>
+    <li><b>Đóng gói (Commit) toàn bộ code vừa sửa:</b>
+      <span class="code-block">git add .<br>git commit -m "fix: chỉnh sửa lỗi sai màu background trang quản trị"</span></li>
+    <li><b>Bắn code của mình lên Mây (GitHub):</b>
+      <span class="code-block">git push origin feature/sua-loi-man-hinh</span></li>
+  </ul>
+
+  <h3>C. Xử lý khi bị "Con Gà" (Merge Conflict)</h2>
+  <p>Khi kéo (Pull) code về mà phát hiện có người khác đã sửa chung một dòng code với mình, VS Code sẽ báo chữ <b>Conflict</b> màu đỏ rực. <br>
+  - <b>Đừng hoảng loạn:</b> Hãy mở trực tiếp file báo lỗi đó lên.<br>
+  - <b>Chọn 1 trong 3 giải pháp:</b> VS Code cung cấp sẵn 3 nút xanh trên đỉnh đầu đoạn lỗi: <i>Accept Current Change</i> (Giữ nguyên code của mình bỏ code người kia), <i>Accept Incoming Change</i> (Chấp nhận Code của người khác chép đè lên của mình), hoặc <i>Accept Both Changes</i> (Nhét cả 2 chung vào 1 chỗ để chạy).</p>
+
+  <h2>5. Tổng Kết (Thành Quả)</h2>
+  <ul>
+    <li><b>Số lượng đóng góp:</b> Đạt trên 50+ commits tính đến bản release v3.5 của dự án.</li>
+    <li><b>Trạng thái:</b> Mọi xung đột code được giải quyết êm đẹp. Nhánh <code>main</code> giữ 100% tỷ lệ biên dịch ổn định (Stable).</li>
+    <li><b>Truy xuất:</b> Tên tuổi và công sức đóng góp của Leader, Pố và Thảo được ghi nhận cực kỳ chi tiết trong mục Contributors của Repository.</li>
+  </ul>
+
+</body>
+</html>
